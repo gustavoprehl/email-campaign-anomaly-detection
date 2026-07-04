@@ -1,0 +1,30 @@
+# Ambiente virtual
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Dados gerados (reprodutíveis via seed fixo, ver README)
+data/raw/*.csv
+data/processed/*.csv
+
+# Excecoes: amostra pequena versionada para inspecao rapida sem rodar o gerador
+!data/sample/
+!data/sample/*.csv
+
+# Outputs de execucao (regeraveis)
+outputs/charts/*.png
+outputs/charts/*.html
+outputs/*.csv
+
+# SO / editor
+.DS_Store
+Thumbs.db
+.vscode/

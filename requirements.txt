@@ -1,0 +1,11 @@
+pandas>=2.2
+numpy>=1.26
+Faker>=24.0
+scikit-learn>=1.4
+matplotlib>=3.8
+plotly>=5.20
+# Usamos "notebook" + "ipykernel" em vez do meta-pacote "jupyter" porque este
+# ultimo instala o jupyterlab, cujas extensoes geram caminhos de arquivo muito
+# longos e quebram a instalacao no Windows sem Long Path habilitado.
+notebook>=7.0
+ipykernel>=6.29
