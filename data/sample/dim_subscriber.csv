@@ -1,0 +1,101 @@
+id_subscriber,nome_fake,email_fake,id_marca_principal,segmento,dat_cadastro
+1,Brenda Alves,samuel32@example.net,5,lead_frio,2025-10-11
+2,Yago Borges,bandrade@example.org,3,cliente_ativo,2026-02-26
+3,Igor Montenegro,novaismiguel@example.net,3,pos_venda,2026-04-12
+4,Ísis Leão,manuelapastor@example.com,3,pos_venda,2025-11-25
+5,Emanuel Sampaio,rfernandes@example.org,2,lead_frio,2025-08-30
+6,Lucca Caldeira,garciagael@example.com,1,pos_venda,2025-08-02
+7,Dr. Augusto Siqueira,hnascimento@example.com,4,lead_frio,2025-12-16
+8,Yuri da Rocha,matheus10@example.net,5,lead_frio,2025-12-30
+9,João Vitor Barros,guilhermegarcia@example.com,3,cliente_ativo,2026-03-11
+10,Maria Clara Castro,daniela34@example.net,1,cliente_ativo,2025-11-16
+11,Ana Sophia Pereira,sophiesiqueira@example.org,4,cliente_ativo,2026-02-15
+12,Ravi Garcia,pedro-lucas50@example.org,5,lead_frio,2025-08-01
+13,Levi Guerra,davi-lucca39@example.net,2,engajado,2026-06-16
+14,Sr. Theo Gonçalves,qcasa-grande@example.org,3,lead_frio,2026-03-12
+15,Vitor Gabriel da Luz,zpacheco@example.com,4,pos_venda,2026-06-18
+16,Davi Miguel Moraes,wborges@example.org,2,cliente_ativo,2026-03-18
+17,Eduardo Pires,laviniapeixoto@example.org,4,lead_frio,2025-10-08
+18,Maria Helena Peixoto,qmoura@example.net,3,cliente_ativo,2026-05-25
+19,Danilo Rodrigues,carolina14@example.com,4,cliente_ativo,2025-09-12
+20,Rafael Abreu,melissa28@example.org,5,lead_frio,2026-01-27
+21,Letícia Porto,leandrofreitas@example.org,3,pos_venda,2026-05-08
+22,Vitória Abreu,mariana01@example.com,3,cliente_ativo,2026-03-19
+23,Isaque Araújo,emanuelbarros@example.net,2,cliente_ativo,2026-02-14
+24,Ana Lívia Teixeira,jose-miguelribeiro@example.com,1,lead_frio,2026-02-22
+25,Eloah da Luz,icunha@example.net,4,lead_frio,2025-11-29
+26,Srta. Luana Guerra,luna87@example.org,1,cliente_ativo,2025-12-27
+27,Henry Gabriel Azevedo,asafe98@example.org,4,lead_frio,2025-08-22
+28,Hellena Abreu,santosdante@example.org,1,lead_frio,2026-01-30
+29,Arthur Gabriel Farias,moraesrenan@example.com,2,cliente_ativo,2026-06-02
+30,Raquel Cunha,maria-juliada-cruz@example.com,3,cliente_ativo,2025-11-04
+31,Esther Brito,ribeirolorena@example.com,2,engajado,2025-07-09
+32,Maria Sophia Martins,rochagael-henrique@example.org,3,pos_venda,2025-12-23
+33,Maitê Caldeira,matheuscorreia@example.net,1,cliente_ativo,2025-07-31
+34,Cecilia Lima,agathamartins@example.org,4,engajado,2025-12-26
+35,Pedro Miguel Novaes,aragaovalentina@example.org,1,cliente_ativo,2026-01-25
+36,Isaac Cavalcante,emendonca@example.org,5,cliente_ativo,2025-10-06
+37,Ana Liz Cavalcante,yabreu@example.com,3,cliente_ativo,2026-01-06
+38,Laura Lima,mcassiano@example.com,2,pos_venda,2025-07-08
+39,Benjamin Pacheco,souzaana-sophia@example.org,1,lead_frio,2026-05-23
+40,Rhavi Montenegro,danilomoraes@example.org,2,lead_frio,2026-01-18
+41,Bernardo Peixoto,rocharavy@example.com,4,lead_frio,2026-03-02
+42,Josué Pacheco,pintoenrico@example.com,2,pos_venda,2026-02-26
+43,Stephany Dias,nicolas53@example.com,5,lead_frio,2026-04-06
+44,Caroline Rios,maria-cecilia51@example.org,4,lead_frio,2026-05-30
+45,Beatriz Barbosa,nataliada-luz@example.org,2,cliente_ativo,2025-07-14
+46,Sr. Joaquim Freitas,levi78@example.net,3,pos_venda,2025-11-13
+47,Vinícius Albuquerque,gustavo-henrique24@example.org,3,cliente_ativo,2026-04-21
+48,Yuri Cassiano,alexia93@example.net,2,lead_frio,2026-06-12
+49,Sr. João Montenegro,dda-cunha@example.org,4,lead_frio,2026-01-04
+50,Mariana da Mota,abreubrenda@example.org,5,lead_frio,2026-06-06
+51,Julia Castro,tnovaes@example.com,3,cliente_ativo,2025-07-17
+52,Alexia Camargo,saleskaique@example.net,5,engajado,2026-06-27
+53,Léo Pacheco,lorenacardoso@example.org,1,engajado,2026-03-30
+54,Luiz Otávio Vieira,fogacaotto@example.net,2,cliente_ativo,2026-05-22
+55,Cauã Fogaça,vpinto@example.org,3,pos_venda,2025-10-23
+56,Enrico Cavalcanti,lalves@example.net,2,cliente_ativo,2026-02-26
+57,Dr. Josué da Mata,henriquegarcia@example.org,5,pos_venda,2025-08-04
+58,Hellena Costa,tferreira@example.org,2,engajado,2025-10-04
+59,Apollo Ribeiro,isabellyfarias@example.com,5,lead_frio,2025-09-26
+60,João Lucas Ferreira,irocha@example.com,1,lead_frio,2026-04-29
+61,Danilo da Luz,viniciusandrade@example.org,4,cliente_ativo,2025-09-04
+62,Maya Ferreira,luiza98@example.org,4,lead_frio,2026-05-15
+63,Esther da Cunha,santosluiza@example.org,2,pos_venda,2025-10-21
+64,Zoe Rodrigues,emanuellalopes@example.org,2,cliente_ativo,2026-06-19
+65,Luísa Pinto,josue48@example.com,3,lead_frio,2025-08-22
+66,Maria Luísa Duarte,ssampaio@example.net,1,lead_frio,2025-09-22
+67,Gael Leão,vrocha@example.org,1,lead_frio,2026-03-04
+68,Liz Guerra,da-rosaallana@example.org,2,pos_venda,2026-01-01
+69,Luna Martins,rmacedo@example.org,4,lead_frio,2026-01-28
+70,Olívia Vieira,enzo-gabrielda-paz@example.net,5,pos_venda,2026-04-19
+71,Lívia Borges,ana-luizacamara@example.org,1,lead_frio,2026-03-26
+72,Apollo Aparecida,maria-laurapimenta@example.org,3,engajado,2025-08-15
+73,Maria Vitória Pires,hadassamonteiro@example.com,1,cliente_ativo,2025-11-22
+74,Diogo Rezende,saheitor@example.com,1,pos_venda,2025-12-25
+75,Felipe Sampaio,jaragao@example.org,2,lead_frio,2026-06-13
+76,Rafael Carvalho,hrios@example.net,5,lead_frio,2026-06-02
+77,Luiza Sá,upimenta@example.net,3,cliente_ativo,2026-01-19
+78,Melissa Castro,qmachado@example.org,5,lead_frio,2025-08-08
+79,Kamilly Vargas,ppires@example.com,4,engajado,2025-11-30
+80,Ana Vitória Silva,ravy45@example.com,1,engajado,2026-02-02
+81,Anna Liz Carvalho,ravigomes@example.net,4,cliente_ativo,2026-04-19
+82,Heitor Azevedo,vjesus@example.net,4,lead_frio,2026-04-12
+83,Maria Vitória Araújo,lauragomes@example.net,4,pos_venda,2025-08-09
+84,Srta. Maria Helena Mendes,fogacaana-cecilia@example.com,2,lead_frio,2026-04-17
+85,Zoe Souza,mariahcamara@example.com,2,cliente_ativo,2026-01-10
+86,Raquel Alves,qfernandes@example.net,5,cliente_ativo,2026-05-12
+87,Eloah Martins,sophiealves@example.com,2,cliente_ativo,2025-11-28
+88,Amanda Barros,dcarvalho@example.org,5,pos_venda,2025-12-03
+89,José Pedro Garcia,otavio75@example.com,5,cliente_ativo,2026-05-12
+90,Lara Sá,fda-cunha@example.com,3,lead_frio,2025-09-29
+91,Vitor Hugo Aragão,pietro10@example.org,5,pos_venda,2026-03-29
+92,Guilherme Almeida,rhavicardoso@example.com,5,lead_frio,2025-08-08
+93,Bruna Nunes,maria-florsampaio@example.com,3,lead_frio,2026-02-02
+94,Sr. Danilo Vasconcelos,ana-liviacaldeira@example.net,1,cliente_ativo,2026-04-27
+95,Leonardo Oliveira,tgoncalves@example.org,5,engajado,2025-08-22
+96,Joaquim Caldeira,isaque90@example.com,3,lead_frio,2025-08-30
+97,Mariane Ribeiro,davi-miguel85@example.org,3,lead_frio,2025-08-25
+98,Rebeca Caldeira,ofonseca@example.com,3,lead_frio,2025-07-08
+99,Srta. Maya Cavalcanti,stephany77@example.com,1,lead_frio,2025-09-02
+100,Dra. Juliana Duarte,erickda-mota@example.com,3,pos_venda,2026-02-01
