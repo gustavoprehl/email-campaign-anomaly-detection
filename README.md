@@ -80,7 +80,10 @@ python src/detect_anomalies_zscore.py
 python src/detect_anomalies_ml.py
 python src/evaluate.py
 
-# 4. (Opcional) Rodar o notebook de visualização
+# 4. (Opcional) Sensibilidade dos parametros de deteccao (z_threshold, contamination)
+python src/threshold_sensitivity.py
+
+# 5. (Opcional) Rodar o notebook de visualização
 jupyter nbconvert --to notebook --execute --inplace notebooks/exploratory_analysis.ipynb
 # ou abra normalmente no Jupyter/VSCode e rode as células
 ```
@@ -128,6 +131,42 @@ alerta, por exemplo, só tratando quedas de abertura como potencial problema.
 
 Resultado completo em [`outputs/comparativo_metodos.csv`](outputs/comparativo_metodos.csv)
 e visualização em [`notebooks/exploratory_analysis.ipynb`](notebooks/exploratory_analysis.ipynb).
+
+### Sensibilidade dos parâmetros (`z_threshold` e `contamination`)
+
+Os parâmetros padrão (`z_threshold=2.5`, `contamination=0.15`) não foram só
+"escolhas razoáveis" — `src/threshold_sensitivity.py` varre uma faixa de
+valores para cada um, reavaliando precisão/recall/F1 com o mesmo critério de
+`evaluate.py` (rodar com `python src/threshold_sensitivity.py`):
+
+| `z_threshold` | Precisão | Recall | F1 |
+|---|---|---|---|
+| 1.5 | 31,5% | 57,5% | 40,7% |
+| 2.0 | 39,6% | 52,5% | 45,2% |
+| **2.5** | **51,3%** | **50,0%** | **50,6%** |
+| 3.0 | 50,0% | 40,0% | 44,4% |
+| 3.5 | 56,0% | 35,0% | 43,1% |
+| 4.0 | 63,6% | 35,0% | 45,2% |
+
+| `contamination` | Precisão | Recall | F1 |
+|---|---|---|---|
+| 0.05 | 55,2% | 40,0% | 46,4% |
+| 0.10 | 53,3% | 40,0% | 45,7% |
+| **0.15** | **51,9%** | **67,5%** | **58,7%** |
+| 0.20 | 50,9% | 70,0% | 58,9% |
+| 0.25 | 50,0% | 85,0% | **63,0%** |
+| 0.30 | 43,2% | 87,5% | 57,9% |
+
+**Leitura**: para o z-score, `2.5` já é o melhor F1 dentre os valores
+testados — a escolha inicial se sustenta. Para o Isolation Forest, porém,
+`contamination=0.25` bate o F1 de `0.15` (63,0% vs. 58,7%), mesmo `0.15`
+sendo a proporção *real* de anomalias injetadas nos dados. Ou seja: mesmo
+"acertando" a calibração com a proporção verdadeira (algo que não se saberia
+em produção), não é o ponto de melhor F1 — o Isolation Forest se beneficia
+de ser um pouco mais permissivo do que a proporção real sugeriria, trocando
+precisão por recall. O script tambem gera um gráfico comparando as três
+curvas (precisão, recall, F1) em `outputs/charts/sensibilidade_threshold.png`
+— não versionado (é regenerado a cada execução do script).
 
 ## Decisões de design
 
