@@ -9,3 +9,4 @@ plotly>=5.20
 # longos e quebram a instalacao no Windows sem Long Path habilitado.
 notebook>=7.0
 ipykernel>=6.29
+pytest>=8.0

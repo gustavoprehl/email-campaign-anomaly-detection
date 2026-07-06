@@ -1,5 +1,7 @@
 # Detecção de Anomalias em Campanhas de E-mail Marketing
 
+[![CI](https://github.com/gustavoprehl/email-campaign-anomaly-detection/actions/workflows/ci.yml/badge.svg)](https://github.com/gustavoprehl/email-campaign-anomaly-detection/actions/workflows/ci.yml)
+
 Projeto de portfólio que simula dados de campanhas de e-mail marketing (estilo
 CRM automotivo multimarca) e compara duas abordagens de detecção de anomalias
 de performance — queda de deliverability, cliques anômalos e picos de
@@ -86,6 +88,19 @@ jupyter nbconvert --to notebook --execute --inplace notebooks/exploratory_analys
 Todas as etapas usam seed fixa (42), então rodar novamente reproduz
 exatamente os mesmos dados e resultados.
 
+## Testes
+
+```bash
+pytest -v
+```
+
+Os testes cobrem as funções puras de cada módulo (agregação, cálculo de
+z-score, formato de saída do Isolation Forest, matriz de confusão e o
+tratamento de `pico_engajamento` como negativo em `evaluate.py`), usando
+fixtures pequenas e determinísticas — não dependem de rodar o pipeline
+completo. Rodam automaticamente via GitHub Actions a cada push/PR para
+`main` (ver badge no topo deste README).
+
 ## Resultados
 
 Rodagem de referência (dados sintéticos gerados com seed 42): 260 disparos
@@ -157,3 +172,5 @@ gerador.
 - **scikit-learn** (`IsolationForest`) — detecção de anomalias via ML
 - **matplotlib** — visualização no notebook
 - **Jupyter (`notebook` + `ipykernel`)** — notebook de análise exploratória
+- **pytest** — testes automatizados
+- **GitHub Actions** — CI (roda a suíte de testes a cada push/PR para `main`)
