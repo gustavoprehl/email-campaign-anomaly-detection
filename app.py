@@ -145,7 +145,7 @@ engajamento bom pode ser confundido com anomalia ruim.
         "`z_threshold=2.5` e `contamination=0.15`."
     )
     fig_sensibilidade = viz.plotar_sensibilidade(dados["sensibilidade"])
-    st.pyplot(fig_sensibilidade)
+    st.pyplot(fig_sensibilidade, width=700)
 
 with aba_campanhas:
     dim_campanha = dados["dim_campanha"]
@@ -170,12 +170,27 @@ with aba_campanhas:
         st.info("Selecione ao menos uma campanha para visualizar os gráficos.")
 
     for id_campanha in selecionadas:
-        st.markdown(f"#### {rotulos[id_campanha]}")
-        fig = viz.plotar_campanha(
-            id_campanha,
-            dados["agregado"],
-            gabarito,
-            dados["zscore"],
-            dados["isolation_forest"],
-        )
-        st.pyplot(fig)
+        st.markdown(f"### {rotulos[id_campanha]}")
+        col_grafico, col_insight = st.columns([3, 2])
+
+        with col_grafico:
+            fig = viz.plotar_campanha(
+                id_campanha,
+                dados["agregado"],
+                gabarito,
+                dados["zscore"],
+                dados["isolation_forest"],
+            )
+            st.pyplot(fig, width=700)
+
+        with col_insight:
+            insight = viz.gerar_insight_campanha(
+                id_campanha,
+                dados["agregado"],
+                dados["zscore"],
+                dados["isolation_forest"],
+                gabarito=gabarito,
+            )
+            st.markdown(insight)
+
+        st.divider()

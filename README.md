@@ -215,6 +215,15 @@ a cada execução do script).
 
 ## Decisões de design
 
+**Insight textual desacoplado do gabarito.** `visualization.gerar_insight_campanha`
+separa duas camadas: "o que o detector encontrou" (métrica, valor e desvio —
+só depende de `agregado` + saídas dos detectores) e "o detector acertou?"
+(cruzamento com a anomalia real, só possível porque o gabarito existe em
+dados sintéticos). O parâmetro `gabarito` é opcional — com `gabarito=None`
+a função ainda funciona, só sem a segunda camada. Decisão pensada para o
+projeto eventualmente consumir dados reais (GCP, Snowflake etc.), cenário em
+que não existe "verdade" conhecida de antemão.
+
 **Z-score por campanha, não global.** Cada campanha tem um baseline de
 engajamento próprio — tipo de campanha, marca, mix de segmentos da lista
 (lead frio vs. cliente engajado, por exemplo). Normalizar globalmente
