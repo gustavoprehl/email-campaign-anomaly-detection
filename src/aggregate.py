@@ -15,7 +15,13 @@ PROCESSED_DIR = Path(__file__).resolve().parent.parent / "data" / "processed"
 
 
 def carregar_fato_evento() -> pd.DataFrame:
-    df = pd.read_csv(RAW_DIR / "fato_evento.csv", parse_dates=["dat_evento"])
+    # date_format="ISO8601" evita que o parser trave: datetime.isoformat()
+    # (usado em generate_data.py) omite microssegundos quando sao zero, o
+    # que gera strings de precisao inconsistente na mesma coluna e faz o
+    # parse_dates "solto" (sem date_format) cair silenciosamente para
+    # dtype string em vez de datetime64 quando o dataset e grande o
+    # suficiente para conter um desses timestamps "redondos".
+    df = pd.read_csv(RAW_DIR / "fato_evento.csv", parse_dates=["dat_evento"], date_format="ISO8601")
     print(f"[fato_evento] {len(df)} eventos carregados.")
     return df
 

@@ -42,7 +42,13 @@ def test_gerar_fato_evento_funil_e_consistente():
         values="dat_evento",
         aggfunc="first",
     ).dropna(subset=["sent", "open"])
-    assert (pd.to_datetime(pivot["open"]) >= pd.to_datetime(pivot["sent"])).all()
+    # format="ISO8601" porque datetime.isoformat() omite microssegundos
+    # quando sao exatamente zero, gerando strings de formato inconsistente
+    # (ex.: "...T01:29:31" vs "...T01:29:31.123456") que quebram a
+    # inferencia de formato unico do pandas.
+    assert (
+        pd.to_datetime(pivot["open"], format="ISO8601") >= pd.to_datetime(pivot["sent"], format="ISO8601")
+    ).all()
 
     # O gabarito deve cobrir exatamente os (id_campanha, id_disparo) gerados.
     disparos_evento = fato_evento[["id_campanha", "id_disparo"]].drop_duplicates()

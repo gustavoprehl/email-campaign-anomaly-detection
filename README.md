@@ -46,8 +46,10 @@ produção.
 
 - **`generate_data.py`**: gera as dimensões (marca, campanha, subscriber) e o
   funil de eventos (`sent → bounce/open → click → unsubscribe`) com seed fixa
-  (42). Injeta anomalias em ~18-20% dos disparos (`queda_deliverability`,
-  `clique_bot`, `pico_engajamento`) e salva o gabarito separadamente.
+  (42), disparando a cada `INTERVALO_DISPARO_DIAS` (3) dias dentro da janela
+  de cada campanha. Injeta anomalias em ~18-20% dos disparos
+  (`queda_deliverability`, `clique_bot`, `pico_engajamento`) e salva o
+  gabarito separadamente.
 - **`aggregate.py`**: agrega `fato_evento` (grão evento) para o grão
   `(id_campanha, id_disparo)`, calculando `taxa_abertura`, `ctr` e `ctor`.
 - **`detect_anomalies_zscore.py`**: z-score móvel **por campanha**, sobre cada
@@ -106,28 +108,38 @@ completo. Rodam automaticamente via GitHub Actions a cada push/PR para
 
 ## Resultados
 
-Rodagem de referência (dados sintéticos gerados com seed 42): 260 disparos
-avaliados, 51 (19,6%) com anomalia injetada — 20 `queda_deliverability`, 20
-`clique_bot`, 11 `pico_engajamento`.
+Rodagem de referência (dados sintéticos gerados com seed 42): 625 disparos
+avaliados (cadência de 3 em 3 dias por campanha, ver decisões de design), 112
+(17,9%) com anomalia injetada — 27 `queda_deliverability`, 43 `clique_bot`,
+42 `pico_engajamento`.
 
 A matriz de confusão trata `pico_engajamento` como **negativo esperado**
 (não deveria virar alerta de problema, ver seção de design abaixo):
 
 | Método | Precisão | Recall | F1 | Recall `queda_deliverability` | Recall `clique_bot` | Falso alarme em `pico_engajamento` |
 |---|---|---|---|---|---|---|
-| z-score | 51,3% | 50,0% | 50,6% | 50% | 50% | 45,5% |
-| Isolation Forest | 51,9% | 67,5% | 58,7% | 45% | 90% | 81,8% |
+| z-score | 43,8% | 70,0% | 53,8% | 70,4% | 69,8% | 83,3% |
+| Isolation Forest | 47,6% | 70,0% | 56,7% | 55,6% | 79,1% | 81,0% |
 
-**Leitura**: o Isolation Forest tem recall e F1 melhores no geral — não
-depende de janela histórica, então funciona desde o primeiro disparo de cada
-campanha, e captura bem `clique_bot` (padrão multivariado: CTR sobe sem
-abertura proporcional). Em compensação, ele é bem pior em não confundir
-`pico_engajamento` com anomalia ruim (81,8% de falso alarme, contra 45,5% do
-z-score). Isso acontece porque **nenhum dos dois métodos usa a direção do
-desvio** — ambos reagem a qualquer desvio grande em relação ao baseline,
-seja para cima ou para baixo, "bom" ou "ruim". Um refinamento natural (fora
-do escopo deste projeto) seria incorporar a direção do desvio na regra de
-alerta, por exemplo, só tratando quedas de abertura como potencial problema.
+**Leitura**: com mais disparos por campanha (ver decisão de design abaixo), o
+recall do z-score subiu bastante frente à rodagem anterior com cadência
+semanal (50,0% → 70,0%) — a perda estrutural dos primeiros disparos de cada
+campanha (sem histórico suficiente) agora pesa menos sobre o total. Os dois
+métodos convergem para o mesmo recall geral (70,0%), com o Isolation Forest
+levando no F1 por ter mais precisão.
+
+Um efeito colateral notável: a taxa de falso alarme em `pico_engajamento` do
+z-score **piorou** (45,5% → 83,3%). Com mais disparos recentes na janela
+móvel, a estimativa de desvio-padrão do baseline fica mais "apertada" (menos
+variância residual não explicada) — então qualquer desvio grande, bom ou
+ruim, cruza o limiar de `|z| > 2.5` com mais facilidade. Mais histórico
+ajuda o z-score a achar problemas reais, mas também o deixa mais nervoso com
+picos de engajamento legítimos. Isso reforça o ponto de design original:
+**nenhum dos dois métodos usa a direção do desvio** — ambos reagem a
+qualquer desvio grande em relação ao baseline, seja para cima ou para baixo,
+"bom" ou "ruim". Um refinamento natural (fora do escopo deste projeto) seria
+incorporar a direção do desvio na regra de alerta, por exemplo, só tratando
+quedas de abertura como potencial problema.
 
 Resultado completo em [`outputs/comparativo_metodos.csv`](outputs/comparativo_metodos.csv)
 e visualização em [`notebooks/exploratory_analysis.ipynb`](notebooks/exploratory_analysis.ipynb).
@@ -141,32 +153,32 @@ valores para cada um, reavaliando precisão/recall/F1 com o mesmo critério de
 
 | `z_threshold` | Precisão | Recall | F1 |
 |---|---|---|---|
-| 1.5 | 31,5% | 57,5% | 40,7% |
-| 2.0 | 39,6% | 52,5% | 45,2% |
-| **2.5** | **51,3%** | **50,0%** | **50,6%** |
-| 3.0 | 50,0% | 40,0% | 44,4% |
-| 3.5 | 56,0% | 35,0% | 43,1% |
-| 4.0 | 63,6% | 35,0% | 45,2% |
+| 1.5 | 28,5% | 81,4% | 42,2% |
+| 2.0 | 35,6% | 75,7% | 48,4% |
+| **2.5** | **43,8%** | **70,0%** | **53,8%** |
+| 3.0 | 43,8% | 55,7% | 49,1% |
+| 3.5 | 49,3% | 51,4% | 50,3% |
+| 4.0 | 50,0% | 50,0% | 50,0% |
 
 | `contamination` | Precisão | Recall | F1 |
 |---|---|---|---|
-| 0.05 | 55,2% | 40,0% | 46,4% |
-| 0.10 | 53,3% | 40,0% | 45,7% |
-| **0.15** | **51,9%** | **67,5%** | **58,7%** |
-| 0.20 | 50,9% | 70,0% | 58,9% |
-| 0.25 | 50,0% | 85,0% | **63,0%** |
-| 0.30 | 43,2% | 87,5% | 57,9% |
+| 0.05 | 57,4% | 38,6% | 46,2% |
+| 0.10 | 54,1% | 57,1% | 55,6% |
+| **0.15** | **47,6%** | **70,0%** | **56,6%** |
+| 0.20 | 44,4% | 84,3% | **58,1%** |
+| 0.25 | 39,5% | 91,4% | 55,2% |
+| 0.30 | 35,6% | 98,6% | 52,3% |
 
-**Leitura**: para o z-score, `2.5` já é o melhor F1 dentre os valores
-testados — a escolha inicial se sustenta. Para o Isolation Forest, porém,
-`contamination=0.25` bate o F1 de `0.15` (63,0% vs. 58,7%), mesmo `0.15`
-sendo a proporção *real* de anomalias injetadas nos dados. Ou seja: mesmo
-"acertando" a calibração com a proporção verdadeira (algo que não se saberia
-em produção), não é o ponto de melhor F1 — o Isolation Forest se beneficia
-de ser um pouco mais permissivo do que a proporção real sugeriria, trocando
-precisão por recall. O script tambem gera um gráfico comparando as três
-curvas (precisão, recall, F1) em `outputs/charts/sensibilidade_threshold.png`
-— não versionado (é regenerado a cada execução do script).
+**Leitura**: para o z-score, `2.5` continua sendo o melhor F1 dentre os
+valores testados. Para o Isolation Forest, `contamination=0.20` agora bate
+o F1 de `0.15` (58,1% vs. 56,6%) — com mais dados, o ponto ótimo de F1 se
+deslocou de `0.25` (na rodagem anterior, com menos disparos) para `0.20`,
+reforçando que calibrar `contamination` pela proporção real de anomalias
+(`0.15` aqui) é um atalho razoável, mas não é garantia do melhor trade-off
+em nenhuma das duas rodagens. O script também gera um gráfico comparando as
+três curvas (precisão, recall, F1) em
+`outputs/charts/sensibilidade_threshold.png` — não versionado (é regenerado
+a cada execução do script).
 
 ## Decisões de design
 
@@ -181,6 +193,18 @@ vale para o Isolation Forest, também treinado por campanha.
 disparo usa apenas os disparos *anteriores* da mesma campanha — nunca o
 próprio valor avaliado —, para que um disparo anômalo não infle seu próprio
 baseline e mascare a própria detecção.
+
+**Cadência de disparo a cada 3 dias, não semanal.** Com disparo semanal e
+campanhas de 30-90 dias, cada campanha tinha só 4-12 disparos, e os 3
+primeiros de cada uma ficavam sem histórico suficiente para o z-score
+(`MIN_DISPAROS_HISTORICO=3`) — uma perda estrutural de recall que não tem a
+ver com a qualidade do método, só com falta de dados. Aumentar a frequência
+de disparo (sem alterar `N_SUBSCRIBERS` nem a duração das campanhas) deu
+mais histórico por campanha e mediu diretamente o efeito: o recall do
+z-score subiu de 50,0% para 70,0% (ver Resultados). Também expôs um
+trade-off novo — mais histórico deixa o baseline mais "apertado", então o
+z-score passou a confundir `pico_engajamento` com problema com mais
+frequência (45,5% → 83,3% de falso alarme).
 
 **Isolation Forest com `contamination=0.15`.** Alinhado à proporção real de
 anomalias injetadas (~18-20%), o que é uma calibração "otimista": em um

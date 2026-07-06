@@ -30,6 +30,13 @@ N_SUBSCRIBERS = 5000
 PERIODO_INICIO = datetime(2025, 7, 1)
 PERIODO_FIM = datetime(2026, 6, 30)
 
+# Cadencia de disparo dentro de cada campanha. Antes era semanal (7 dias,
+# piso de 4 disparos); reduzida para aumentar o numero de disparos por
+# campanha sem alterar N_SUBSCRIBERS nem a duracao das campanhas (ver
+# _gerar_disparos_da_campanha).
+INTERVALO_DISPARO_DIAS = 3
+MIN_DISPAROS_POR_CAMPANHA = 8
+
 TIPOS_CAMPANHA = ["promocional", "pos_venda", "reimpactacao", "institucional"]
 SEGMENTOS = ["lead_frio", "cliente_ativo", "pos_venda", "engajado"]
 
@@ -154,13 +161,22 @@ def gerar_dim_subscriber(rng: np.random.Generator, faker: Faker) -> pd.DataFrame
 def _gerar_disparos_da_campanha(
     campanha: pd.Series, rng: np.random.Generator
 ) -> list[datetime]:
-    """Gera as datas de disparo (ex.: semanais) dentro da janela da campanha."""
+    """Gera as datas de disparo dentro da janela da campanha, a cada
+    INTERVALO_DISPARO_DIAS dias (nao mais semanal).
+
+    Por que: com cadencia semanal e campanhas de 30-90 dias, cada campanha
+    tinha so 4-12 disparos, e os 3 primeiros de cada uma ficavam sem
+    historico suficiente para o z-score (MIN_DISPAROS_HISTORICO=3) — uma
+    perda estrutural de recall que nao tem a ver com a qualidade do metodo.
+    Aumentar a frequencia de disparo (sem mexer no numero de subscribers
+    nem na duracao da campanha) da mais historico por campanha, diluindo
+    essa perda estrutural."""
     dat_inicio = datetime.fromisoformat(campanha["dat_inicio"])
     dat_fim = datetime.fromisoformat(campanha["dat_fim"])
-    duracao_dias = max((dat_fim - dat_inicio).days, 7)
-    n_disparos = max(duracao_dias // 7, 4)
+    duracao_dias = max((dat_fim - dat_inicio).days, INTERVALO_DISPARO_DIAS)
+    n_disparos = max(duracao_dias // INTERVALO_DISPARO_DIAS, MIN_DISPAROS_POR_CAMPANHA)
 
-    disparos = [dat_inicio + timedelta(days=7 * i) for i in range(n_disparos)]
+    disparos = [dat_inicio + timedelta(days=INTERVALO_DISPARO_DIAS * i) for i in range(n_disparos)]
     return disparos
 
 
