@@ -31,7 +31,7 @@ def test_calcular_metricas_sem_positivos_previstos_nao_gera_divisao_por_zero():
     assert metricas["f1"] == 0.0
 
 
-def test_gabarito_ajustado_trata_pico_engajamento_como_negativo():
+def test_ajustar_gabarito_trata_pico_engajamento_como_negativo():
     gabarito = pd.DataFrame(
         [
             {
@@ -54,11 +54,37 @@ def test_gabarito_ajustado_trata_pico_engajamento_como_negativo():
             },
         ]
     )
-    gabarito["flg_anomalia_problema"] = gabarito["flg_anomalia_injetada"] & gabarito[
-        "tipo_anomalia_injetada"
-    ].isin(ev.TIPOS_ANOMALIA_PROBLEMA)
 
-    assert gabarito["flg_anomalia_problema"].tolist() == [False, True, False]
+    resultado = ev.ajustar_gabarito(gabarito)
+
+    assert resultado["flg_anomalia_problema"].tolist() == [False, True, False]
+
+
+def test_reduzir_deteccoes_por_disparo_zscore_usa_any_entre_metricas():
+    zscore = pd.DataFrame(
+        [
+            {"id_campanha": 1, "id_disparo": 1, "metrica_avaliada": "taxa_abertura", "flg_anomalia_detectada": False},
+            {"id_campanha": 1, "id_disparo": 1, "metrica_avaliada": "ctr", "flg_anomalia_detectada": True},
+            {"id_campanha": 1, "id_disparo": 2, "metrica_avaliada": "taxa_abertura", "flg_anomalia_detectada": False},
+            {"id_campanha": 1, "id_disparo": 2, "metrica_avaliada": "ctr", "flg_anomalia_detectada": False},
+        ]
+    )
+    isolation_forest = pd.DataFrame(
+        [
+            {"id_campanha": 1, "id_disparo": 1, "flg_anomalia_detectada": False},
+            {"id_campanha": 1, "id_disparo": 2, "flg_anomalia_detectada": True},
+        ]
+    )
+
+    resultado = ev.reduzir_deteccoes_por_disparo(zscore, isolation_forest)
+
+    zscore_reduzido = resultado.loc[resultado["metodo"] == "zscore"].set_index("id_disparo")
+    assert zscore_reduzido.loc[1, "flg_anomalia_detectada"] == True
+    assert zscore_reduzido.loc[2, "flg_anomalia_detectada"] == False
+
+    if_reduzido = resultado.loc[resultado["metodo"] == "isolation_forest"].set_index("id_disparo")
+    assert if_reduzido.loc[1, "flg_anomalia_detectada"] == False
+    assert if_reduzido.loc[2, "flg_anomalia_detectada"] == True
 
 
 def test_avaliar_metodo_trata_falso_alarme_em_pico_engajamento_como_fp():

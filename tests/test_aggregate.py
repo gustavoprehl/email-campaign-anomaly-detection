@@ -40,6 +40,21 @@ def test_agregar_por_disparo_calcula_taxas_corretas():
     assert linha["dat_referencia"] == pd.Timestamp("2026-01-01")
 
 
+def test_agregar_por_disparo_aceita_dat_evento_como_string_iso():
+    """generate_data.gerar_fato_evento produz dat_evento como string ISO8601
+    (isoformat()), nao datetime64 - o app Streamlit passa esse DataFrame
+    direto para agregar_por_disparo, sem passar por CSV/parse_dates. A
+    funcao precisa aceitar os dois formatos."""
+    fato_evento = _fato_evento_fixture()
+    fato_evento["dat_evento"] = fato_evento["dat_evento"].apply(lambda ts: ts.isoformat())
+
+    agregado = agg.agregar_por_disparo(fato_evento)
+
+    assert len(agregado) == 1
+    assert agregado.iloc[0]["qtd_enviados"] == 4
+    assert agregado.iloc[0]["dat_referencia"] == pd.Timestamp("2026-01-01")
+
+
 def test_anexar_gabarito_preserva_todas_as_linhas_do_agregado():
     fato_evento = _fato_evento_fixture()
     agregado = agg.agregar_por_disparo(fato_evento)

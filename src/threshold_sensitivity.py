@@ -19,12 +19,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
 
 import detect_anomalies_ml as dml
 import detect_anomalies_zscore as dz
 import evaluate as ev
+import visualization as viz
 
 PROCESSED_DIR = Path(__file__).resolve().parent.parent / "data" / "processed"
 OUTPUTS_DIR = Path(__file__).resolve().parent.parent / "outputs"
@@ -32,10 +32,6 @@ CHARTS_DIR = OUTPUTS_DIR / "charts"
 
 Z_THRESHOLDS = [1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
 CONTAMINATIONS = [0.05, 0.10, 0.15, 0.20, 0.25, 0.30]
-
-COR_PRECISAO = "#2a78d6"
-COR_RECALL = "#4a3aa7"
-COR_F1 = "#eb6834"
 
 
 def carregar_agregado() -> pd.DataFrame:
@@ -110,31 +106,14 @@ def avaliar_isolation_forest_em_varios_contaminations(
     return pd.DataFrame(resultados)
 
 
-def plotar_sensibilidade(sensibilidade: pd.DataFrame) -> None:
+def salvar_grafico_sensibilidade(sensibilidade: pd.DataFrame) -> None:
+    """Gera o grafico via visualization.plotar_sensibilidade (compartilhado
+    com o app Streamlit) e salva em disco para uso no CLI/README."""
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
-    fig, eixos = plt.subplots(1, 2, figsize=(12, 4.5))
-
-    paineis = [
-        ("zscore", "z-score (limiar |z|)"),
-        ("isolation_forest", "Isolation Forest (contamination)"),
-    ]
-    for eixo, (metodo, titulo) in zip(eixos, paineis):
-        subset = sensibilidade.loc[sensibilidade["metodo"] == metodo].sort_values("valor")
-        eixo.plot(subset["valor"], subset["precisao"], color=COR_PRECISAO, marker="o", label="Precisao")
-        eixo.plot(subset["valor"], subset["recall"], color=COR_RECALL, marker="o", label="Recall")
-        eixo.plot(subset["valor"], subset["f1"], color=COR_F1, marker="o", linewidth=2.5, label="F1")
-        eixo.set_title(titulo)
-        eixo.set_xlabel("valor do parametro")
-        eixo.set_ylim(0, 1)
-        eixo.grid(True, linewidth=0.5, color="#e1e0d9")
-
-    eixos[0].set_ylabel("score")
-    eixos[0].legend(frameon=False)
-    plt.tight_layout()
+    fig = viz.plotar_sensibilidade(sensibilidade)
 
     caminho = CHARTS_DIR / "sensibilidade_threshold.png"
-    plt.savefig(caminho, dpi=150)
-    plt.close(fig)
+    fig.savefig(caminho, dpi=150)
     print(f"Grafico salvo em {caminho}")
 
 
@@ -150,7 +129,7 @@ def main() -> None:
 
     saida = OUTPUTS_DIR / "sensibilidade_threshold.csv"
     sensibilidade.to_csv(saida, index=False)
-    plotar_sensibilidade(sensibilidade)
+    salvar_grafico_sensibilidade(sensibilidade)
 
     print("=== Sensibilidade ao threshold/contamination ===\n")
     for metodo in ["zscore", "isolation_forest"]:

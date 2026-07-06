@@ -26,27 +26,34 @@ OUTPUTS_DIR = Path(__file__).resolve().parent.parent / "outputs"
 TIPOS_ANOMALIA_PROBLEMA = ["queda_deliverability", "clique_bot"]
 
 
+def ajustar_gabarito(gabarito: pd.DataFrame) -> pd.DataFrame:
+    """Cria flg_anomalia_problema, que exclui pico_engajamento do conjunto
+    de positivos (ver docstring do modulo). Funcao pura (sem I/O) para ser
+    reutilizada tanto pelo pipeline em disco quanto pelo app Streamlit,
+    que roda tudo em memoria."""
+    gabarito = gabarito.copy()
+    gabarito["flg_anomalia_problema"] = gabarito["flg_anomalia_injetada"] & gabarito[
+        "tipo_anomalia_injetada"
+    ].isin(TIPOS_ANOMALIA_PROBLEMA)
+    return gabarito
+
+
 def carregar_gabarito_ajustado() -> pd.DataFrame:
-    """Carrega o gabarito e cria flg_anomalia_problema, que exclui
-    pico_engajamento do conjunto de positivos (ver docstring do modulo)."""
     df = pd.read_csv(RAW_DIR / "gabarito_anomalias.csv")
-    df["flg_anomalia_problema"] = df["flg_anomalia_injetada"] & df["tipo_anomalia_injetada"].isin(
-        TIPOS_ANOMALIA_PROBLEMA
-    )
-    return df
+    return ajustar_gabarito(df)
 
 
-def carregar_deteccoes_por_disparo() -> pd.DataFrame:
-    """Le as deteccoes de ambos os metodos e reduz para uma linha por
+def reduzir_deteccoes_por_disparo(zscore: pd.DataFrame, isolation_forest: pd.DataFrame) -> pd.DataFrame:
+    """Reduz as deteccoes de ambos os metodos para uma linha por
     (id_campanha, id_disparo, metodo): um disparo e considerado
     'detectado' pelo z-score se QUALQUER uma das 3 metricas (taxa_abertura,
     ctr, ctor) estourou o limiar — o z-score avalia cada metrica
     isoladamente, entao a agregacao por 'any' e o equivalente a perguntar
     'esse disparo teve algum sinal fora do padrao'. O Isolation Forest ja
-    produz uma linha por disparo (metrica_avaliada='combinado')."""
-    zscore = pd.read_csv(OUTPUTS_DIR / "anomalias_zscore.csv")
-    isolation_forest = pd.read_csv(OUTPUTS_DIR / "anomalias_isolation_forest.csv")
+    produz uma linha por disparo (metrica_avaliada='combinado').
 
+    Funcao pura (sem I/O) para ser reutilizada tanto pelo pipeline em disco
+    quanto pelo app Streamlit."""
     zscore_por_disparo = (
         zscore.groupby(["id_campanha", "id_disparo"])["flg_anomalia_detectada"]
         .any()
@@ -58,6 +65,12 @@ def carregar_deteccoes_por_disparo() -> pd.DataFrame:
     if_por_disparo["metodo"] = "isolation_forest"
 
     return pd.concat([zscore_por_disparo, if_por_disparo], ignore_index=True)
+
+
+def carregar_deteccoes_por_disparo() -> pd.DataFrame:
+    zscore = pd.read_csv(OUTPUTS_DIR / "anomalias_zscore.csv")
+    isolation_forest = pd.read_csv(OUTPUTS_DIR / "anomalias_isolation_forest.csv")
+    return reduzir_deteccoes_por_disparo(zscore, isolation_forest)
 
 
 def calcular_matriz_confusao(y_true: pd.Series, y_pred: pd.Series) -> dict[str, int]:

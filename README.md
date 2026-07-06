@@ -58,8 +58,13 @@ produção.
   vetor `[taxa_abertura, ctr, ctor, qtd_enviados]`.
 - **`evaluate.py`**: cruza as duas detecções com o gabarito e calcula matriz
   de confusão, precisão, recall e F1 por método.
+- **`threshold_sensitivity.py`**: varre `z_threshold` e `contamination`,
+  reavaliando precisão/recall/F1 para cada valor.
+- **`src/visualization.py`**: funções de plot compartilhadas entre o notebook
+  e o dashboard, para as duas interfaces nunca divergirem visualmente.
 - **`notebooks/exploratory_analysis.ipynb`**: visualiza as séries temporais de
   `taxa_abertura` e `ctr`, sobrepondo gabarito e as duas detecções.
+- **`app.py`**: dashboard Streamlit interativo (ver seção própria abaixo).
 
 ## Como rodar
 
@@ -92,6 +97,34 @@ jupyter nbconvert --to notebook --execute --inplace notebooks/exploratory_analys
 
 Todas as etapas usam seed fixa (42), então rodar novamente reproduz
 exatamente os mesmos dados e resultados.
+
+## Dashboard interativo (Streamlit)
+
+```bash
+streamlit run app.py
+```
+
+O app roda o pipeline inteiro (geração de dados → agregação → detecção →
+avaliação → sensibilidade) **em memória**, sem depender de nenhum arquivo em
+`data/` ou `outputs/` já ter sido gerado antes — os dados são 100%
+reprodutíveis via seed fixa (42), então o dashboard funciona só com o código
+do repositório, em qualquer máquina/deploy limpo. O resultado fica em cache
+(`st.cache_data`), então só roda de fato uma vez por sessão.
+
+Duas abas:
+- **Visão Geral** — KPIs do dataset sintético, comparativo de métodos
+  (precisão/recall/F1, mesmos critérios de `evaluate.py`) e as curvas de
+  sensibilidade de `threshold_sensitivity.py`, com a leitura de cada
+  resultado.
+- **Campanhas** — seletor com as 30 campanhas geradas; para cada uma
+  selecionada, plota `taxa_abertura` e `ctr` com overlay de gabarito,
+  detecção z-score e detecção Isolation Forest (a mesma função de
+  `src/visualization.py` usada no notebook).
+
+**Deploy no Streamlit Community Cloud**: como o app não depende de arquivos
+pré-gerados, basta apontar o Streamlit Cloud para este repositório
+(branch `main`, arquivo principal `app.py`) — o `requirements.txt` já cobre
+todas as dependências.
 
 ## Testes
 
@@ -233,7 +266,8 @@ gerador.
 - **pandas / numpy** — geração, agregação e manipulação dos dados
 - **Faker** (`pt_BR`) — nomes e e-mails fictícios dos subscribers
 - **scikit-learn** (`IsolationForest`) — detecção de anomalias via ML
-- **matplotlib** — visualização no notebook
+- **matplotlib** — visualização no notebook e no dashboard
 - **Jupyter (`notebook` + `ipykernel`)** — notebook de análise exploratória
+- **Streamlit** — dashboard interativo (`app.py`)
 - **pytest** — testes automatizados
 - **GitHub Actions** — CI (roda a suíte de testes a cada push/PR para `main`)

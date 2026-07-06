@@ -40,7 +40,17 @@ def agregar_por_disparo(fato_evento: pd.DataFrame) -> pd.DataFrame:
     Cada disparo vira exatamente uma linha: opens/clicks sao contados pelo
     id_disparo de origem, independente de quantos dias depois do envio
     ocorreram (a cauda de abertura/clique vai ate 7 dias).
+
+    Aceita dat_evento tanto como datetime64 (ex.: vindo de
+    carregar_fato_evento(), que ja faz o parse) quanto como string ISO8601
+    (ex.: o DataFrame gerado em memoria por generate_data.gerar_fato_evento,
+    usado pelo app Streamlit sem passar por CSV) - normaliza no inicio da
+    funcao para os dois casos funcionarem.
     """
+    fato_evento = fato_evento.copy()
+    if not pd.api.types.is_datetime64_any_dtype(fato_evento["dat_evento"]):
+        fato_evento["dat_evento"] = pd.to_datetime(fato_evento["dat_evento"], format="ISO8601")
+
     contagens = (
         fato_evento.groupby(["id_campanha", "id_disparo", "tipo_evento"])
         .size()
