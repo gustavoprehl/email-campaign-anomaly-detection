@@ -4,8 +4,8 @@
 
 Projeto de portfólio que simula dados de campanhas de e-mail marketing (estilo
 CRM automotivo multimarca) e compara duas abordagens de detecção de anomalias
-de performance — queda de deliverability, cliques anômalos e picos de
-engajamento orgânico — uma estatística simples (z-score) e uma de Machine
+de performance, queda de deliverability, cliques anômalos e picos de
+engajamento orgânico, uma estatística simples (z-score) e uma de Machine
 Learning (Isolation Forest).
 
 ## Contexto e motivação
@@ -14,7 +14,7 @@ Times de CRM/marketing automation monitoram diariamente métricas de funil
 (taxa de abertura, CTR, CTOR) por campanha e disparo. Na prática, esses
 alertas costumam ser regras fixas ("abertura caiu abaixo de X%"), que não se
 adaptam ao baseline de cada campanha nem distinguem uma queda real de
-deliverability de uma variação normal — ou pior, de um pico de engajamento
+deliverability de uma variação normal, ou pior, de um pico de engajamento
 bom (ex.: uma campanha de Black Friday) que não deveria disparar alarme
 nenhum.
 
@@ -22,7 +22,7 @@ Este projeto usa esse cenário como pretexto para comparar, de forma
 controlada, duas abordagens de detecção: uma totalmente interpretável
 (z-score sobre uma janela móvel) e uma orientada a dados (Isolation Forest).
 Como os dados são sintéticos, existe um **gabarito** de quais disparos
-realmente têm um problema injetado — o que permite calcular precisão, recall
+realmente têm um problema injetado, o que permite calcular precisão, recall
 e F1 de cada método, algo que normalmente não é possível fazer com dados de
 produção.
 
@@ -106,13 +106,13 @@ streamlit run app.py
 
 O app roda o pipeline inteiro (geração de dados → agregação → detecção →
 avaliação → sensibilidade) **em memória**, sem depender de nenhum arquivo em
-`data/` ou `outputs/` já ter sido gerado antes — os dados são 100%
+`data/` ou `outputs/` já ter sido gerado antes, os dados são 100%
 reprodutíveis via seed fixa (42), então o dashboard funciona só com o código
 do repositório, em qualquer máquina/deploy limpo. O resultado fica em cache
 (`st.cache_data`), então só roda de fato uma vez por sessão.
 
 Duas abas:
-- **Visão Geral** — KPIs do dataset sintético, comparativo de métodos
+- **Visão Geral** - KPIs do dataset sintético, comparativo de métodos
   (precisão/recall/F1, mesmos critérios de `evaluate.py`) e as curvas de
   sensibilidade de `threshold_sensitivity.py`, com a leitura de cada
   resultado.
